@@ -99,4 +99,64 @@ Normally we shall find the four triangles doing so.
 
 #### 2.2.5 Find the camera orientation
 
-This is the hard part.
+This is the hard part.  
+Here some leads on where to look:
+- homography: https://en.wikipedia.org/wiki/Homography_(computer_vision)
+- https://nulldog.com/camera-pose-estimation-from-homography-of-4-points
+
+Here a quick explanation on how it works:  
+We have the following equation 
+$$ \lambda PT \vec x= \vec p $$
+$P$ the projection matrix \\
+$T$ the camera transformation matrix \\
+$\vec x$ the point in 3D space \\
+$\lambda$ the zooming factor \\
+$\vec p$ the position on the image (in 2D space) \\
+
+If we develop it, we get this equation
+$$\lambda 
+\begin{pmatrix} 
+f & 0 & C_x \\ 
+0 & f & C_y \\ 
+0 & 0 & 1 
+\end{pmatrix}
+\begin{pmatrix} 
+r_{1,1} & r_{2,1} & r_{3,1} & t_x \\ 
+r_{1,2} & r_{2,2} & r_{3,2} & t_y \\ 
+r_{1,3} & r_{2,3} & r_{3,4} & t_z
+\end{pmatrix}
+\begin{pmatrix} 
+x \\ y \\ z \\ 1 
+\end{pmatrix}
+=
+\begin{pmatrix} 
+x_s \\ y_s \\ s  
+\end{pmatrix} $$
+
+To simplify the problem, we take the spatial coordinates so that z = 0. So, we get the following equation
+
+$$\lambda 
+\begin{pmatrix} 
+f & 0 & C_x \\ 
+0 & f & C_y \\ 
+0 & 0 & 1 
+\end{pmatrix}
+\begin{pmatrix} 
+r_{1,1} & r_{2,1} & t_x \\ 
+r_{1,2} & r_{2,2} & t_y \\ 
+r_{1,3} & r_{2,3} & t_z
+\end{pmatrix}
+\begin{pmatrix} 
+x \\ y \\ 1 
+\end{pmatrix}
+=
+\begin{pmatrix} 
+x_s \\ y_s \\ s  
+\end{pmatrix} $$
+
+Let $H$ be $\lambda P T$. $H$ is a square 3x3 matrix ! With the homography method, we can compute this $H$ matrix (called the homography matrix).
+
+This matrix is all we need. In fact, we can use it to project the voxels into an image.
+
+Note that we don't have $r_{3,1}$, $r_{3,2}$ and $r_{3,3}$. It is possibly something pretty problematic, I don't know now, we will see.
+
